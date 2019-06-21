@@ -1,10 +1,10 @@
 # Isometric Game World
 ## Programming Practice: Creating an isometric world. 
 
-### Objective:
+## Objective
 Create something similar to how Diablo 2 looks. 
 
-### Plan:
+## Plan
 #### Basics
 Create a grid for map, mark each space as a piece of terrain from TERRAIN array. 
 Run through grid and draw sprite corresponding to each terrain. 

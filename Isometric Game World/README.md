@@ -2,7 +2,7 @@
 ## Programming Practice: Creating an isometric world. 
 
 ## Objective
-Create something similar to how Diablo 2 looks. 
+Create a usable isometric game world, something similar to Diablo, with scripts to help with position conversion. 
 
 ## Plan
 #### Basics

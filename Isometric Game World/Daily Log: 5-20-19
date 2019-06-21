@@ -1,0 +1,5 @@
+# Log: 5-20-19
+
+Set up terrain tiles, map and sprites to represent terrain. 
+Made code to loop through the grid and place a terrain type mark corresponding to the mapSprite it found. 
+Terrain Map (images/terrainMap.png)

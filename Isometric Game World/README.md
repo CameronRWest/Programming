@@ -18,5 +18,6 @@ Create variants for sprites.
 #### Point conversion
 Need two scripts for point conversions. One going from screen to map, the other going from map to screen. 
 Math reference (http://clintbellanger.net/articles/isometric_math/)
+
 > map.x = (screen.x / TILE_WIDTH_HALF + screen.y / TILE_HEIGHT_HALF) /2;
 > map.y = (screen.y / TILE_HEIGHT_HALF -(screen.x / TILE_WIDTH_HALF)) /2;

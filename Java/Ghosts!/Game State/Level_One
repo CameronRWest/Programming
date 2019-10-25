@@ -1,0 +1,186 @@
+// -------------------------Level One extends the gameState class, it is a state that the game can be in. 
+
+    public class Level_01_State extends GameState {
+
+    //variables
+    private Background bg;
+    private boolean hasMade = false;
+
+    private Player player;
+    private boolean fired = false;
+
+    private ArrayList<Enemy> enemies;
+    private int enemyIndex = 0;
+    private int enemyCol = 10;
+    private int enemyRow = 4;
+    private int random; 
+    private double nextFire;
+    private double fireRate;
+
+    private ArrayList<Rock> rocks;
+    private int rockAmount = 4;
+
+    private boolean won = false;
+    private int points = 5;
+    private boolean cheating = false;
+
+    private SpriteManager spMgr;
+    private GamePanel GP;
+
+// --------------Setting up variables for this state
+    //constructor
+    public Level_01_State(StateManager sm, SpriteManager sp, GamePanel gp) {
+        this.sm = sm;
+        spMgr = sp;
+        GP = gp;
+        
+        if(!hasMade) {
+            //create background
+            bg = new Background(spMgr.levelBackgroundSprite(), 1);
+
+            //create player
+            player = new Player(sm, spMgr);
+            player.setPosition(GamePanel.WIDTH / 2,GamePanel.HEIGHT - 10);
+
+            //create rocks
+            rocks = new ArrayList<Rock>();
+            for (int i = 0; i < rockAmount; i++) { rocks.add(new Rock(spMgr) ); }
+            for (int j = 0; j < rocks.size(); j++) {
+                rocks.get(j).setPosition(15 + (70 * j + rocks.get(j).getWidth()), 175);
+            }
+
+            //create enemy
+            enemies = new ArrayList<Enemy>();
+            for (int i = 0; i < enemyCol; i++) {
+                for (int j = 0; j < enemyRow; j++) {
+                    enemies.add(new Enemy(spMgr));
+                    enemies.get(enemyIndex).setPosition(50 + (18 * i + enemies.get(enemyIndex).getWidth()),
+                                                        20 + (16 * j + enemies.get(enemyIndex).getHeight()));
+                    enemyIndex++;
+                }
+            }
+            nextFire = 0;
+            fireRate = 900000000;
+
+            //set max points
+            sm.setMaxPoints(enemyCol * enemyRow * points);
+
+            hasMade = true;
+        }
+    }
+
+    public void init() {}
+
+// ----------------------------------Fairly simple idea, update method used to run updates on all things in the level
+// ----------------------------------Draw method draws those positions and objects to screen
+
+    //update the level
+    public void update() {
+        //if player hasn't won or died
+        if (!player.getDead() && !won){
+            //---------------------PLAYER
+            player.update();
+            player.checkAttack(enemies, sm, points);
+            player.checkAttackRocks(rocks);
+
+            //---------------------ROCKS
+            for (int i = 0; i < rocks.size(); i++) { rocks.get(i).update(); }
+            
+            //---------------------ENEMY
+            if(enemies.size() != 0) { //if there are enemies, continue
+                //update enemy
+                for(int i = 0; i < enemies.size(); i++) {
+                    //check if we need to change direction
+                    if(enemies.get(i).changeDirection()) {
+                        //if we do, loop through the enemies and move them down 
+                        for(int j = 0; j < enemies.size(); j++) {
+                            enemies.get(j).setY(enemies.get(j).getY() + 10);
+                            enemies.get(j).setMoveSpeed(-enemies.get(j).getMoveSpeed());
+                            enemies.get(j).update(); 
+                        }
+                        return;
+                    } else {
+                        enemies.get(i).update(); 
+                    }
+                }
+                //enemy shooting
+                if(System.nanoTime() > nextFire) {
+                    random = (int) (Math.random() * enemies.size());
+                    enemies.get(random).shoot();
+                    nextFire = System.nanoTime() + fireRate;
+                }
+                //check enemy's attack
+                for(int i = 0; i < enemies.size(); i++) {
+                    //did we hit a rock
+                    enemies.get(i).checkAttackRocks(rocks);
+                    //did we hit player
+                    enemies.get(i).checkAttackPlayer(player);
+                }
+                //check if enemies hit the ground
+                for(int i = 0; i < enemies.size(); i++) {
+                    if(enemies.get(i).intersects(player)) {
+                        player.setDead(true);
+                        sm.setLanded(true);
+                    }
+                }
+            } else { //all enemies defeated
+                won = true;
+            }
+        } else {
+            //go to win/lose
+            sm.setState(1);
+        }
+    }
+
+    //draw level
+    public void draw (Graphics2D g) {
+        //draw bg
+        bg.draw(g);
+
+        //draw player
+        player.draw(g);
+
+        //draw rocks
+        for (int i=0; i < rocks.size(); i++) { rocks.get(i).draw(g); }
+
+        //draw enemies
+        for (int i=0; i < enemies.size(); i++) { enemies.get(i).draw(g); }
+
+        //check for cheaters
+        if(cheating) {
+            g.setColor(Color.RED);
+            g.drawString ("Fire Rate Increased...CHEATER!", 5, 30);
+        }else if(sm.getCheated()) {
+            g.setColor(Color.RED);
+            g.drawString ("CHEATED", 5, 30);
+        }
+
+        //draw score
+        g.setColor(Color.ORANGE);
+        g.drawString ("Score: " + sm.getScore(), 5, 15);
+    }
+
+    public void keyPressed(int k) {
+        if(k == KeyEvent.VK_P) {
+            GP.setPaused(!GP.getPaused());
+        }
+        if(k == KeyEvent.VK_U) cheater();
+        if(k == KeyEvent.VK_LEFT) player.setLeft(true);
+        if(k == KeyEvent.VK_RIGHT) player.setRight(true);
+        if(k == KeyEvent.VK_SPACE) {
+            if(!fired) {
+                player.setFiring(true);
+                fired = true;
+            }
+        }
+    }
+
+    public void keyReleased(int k) {
+        if(k == KeyEvent.VK_LEFT) player.setLeft(false);
+        if(k == KeyEvent.VK_RIGHT) player.setRight(false);
+        if(k == KeyEvent.VK_SPACE) {
+            player.setFiring(false);
+            fired = false;
+        }
+    }
+}

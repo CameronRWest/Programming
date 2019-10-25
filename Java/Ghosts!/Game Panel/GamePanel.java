@@ -1,6 +1,5 @@
-# Game Panel
-    
-    ## This is defining window properties. 
+// -------------This is defining window properties. 
+
     //sets up the dimensions of the windowed screen
     public GamePanel() {
         super();
@@ -32,8 +31,8 @@
 
     private void init() { }
 
-    ## The run method where we are calling the methods for the rest of the game, including the draw.
-    ## This is also where we have the game loop itself. It will use the code to run at a dictated frame rate.
+// -------------The run method where we are calling the methods for the rest of the game, including the draw.
+// -------------This is also where we have the game loop itself. It will use the code to run at a dictated frame rate.
     //running the program
     public void run() {
         init();
@@ -67,13 +66,13 @@
     public void setPaused(boolean b) {paused = b;}
     public boolean getPaused() {return paused;}
     
-    ## Method for updating the game
+// -------------Method for updating the game
     //updates the game
     private void update() {
         sm.update();
     }
     
-    ## Drawing our game, then using 'drawToScreen' to draw our game to the window space
+// -------------Drawing our game, then using 'drawToScreen' to draw our game to the window space
     //draws the images from the new updates
     private void draw() {
         sm.draw(g);
